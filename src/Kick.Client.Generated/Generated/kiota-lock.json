@@ -1,0 +1,23 @@
+{
+  "descriptionLocation": "../../../../openapi/kick-swagger.yaml",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.30.0",
+  "clientClassName": "KickApiClient",
+  "clientNamespaceName": "Kick.Client.Generated",
+  "language": "CSharp",
+  "descriptionHash": "",
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Form.FormSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Multipart.MultipartSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Text.TextParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Form.FormParseNodeFactory"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "openAPIFilePath": "../../../../openapi/kick-swagger.yaml"
+}

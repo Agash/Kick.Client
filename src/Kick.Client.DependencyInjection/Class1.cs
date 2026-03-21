@@ -1,6 +1,1 @@
-﻿namespace Kick.Client.DependencyInjection;
-
-public class Class1
-{
-
-}
+// See KickClientServiceExtensions.cs

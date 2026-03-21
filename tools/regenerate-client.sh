@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # Regenerates Kick.Client.Generated from the local OpenAPI spec.
-# Requires: kiota (dotnet tool install -g Microsoft.OpenApi.Kiota)
-# Also requires swagger2openapi: npm install -g swagger2openapi
+# Prerequisites: npm install -g swagger2openapi && dotnet tool install -g Microsoft.OpenApi.Kiota
 
 set -euo pipefail
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SPEC_PATH="${1:-$SCRIPT_DIR/../openapi/kick-swagger.yaml}"
 OPENAPI_PATH="${SPEC_PATH%.yaml}.openapi3.yaml"

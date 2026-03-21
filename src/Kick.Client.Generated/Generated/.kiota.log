@@ -1,0 +1,20 @@
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1public~1v1~1channels~1rewards~1{id}/delete/parameters/0/schema - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1public~1v1~1channels~1rewards~1{id}/patch/parameters/0/schema - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1public~1v1~1channels~1rewards~1redemptions/get/parameters/0/schema - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1public~1v1~1channels~1rewards~1redemptions/get/parameters/3/schema - The format base64 is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.AcceptChannelRewardRedemptionsParams/properties/ids/items - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.ChannelReward/properties/background_color - The format hexcolor is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.ChannelReward/properties/id - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.ChannelRewardRedemption/properties/id - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.FailedRedemption/properties/id - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.MinimalChannelReward/properties/cost - The format uint64 is not supported by Kiota for the type Integer and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.MinimalChannelReward/properties/id - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.PatchChannelRewardsBody/properties/background_color - The format hexcolor is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.PostChannelRewardsBody/properties/background_color - The format hexcolor is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.RejectChannelRewardRedemptionsParams/properties/ids/items - The format ulid is not supported by Kiota for the type String and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/endpoints.UserInfo/properties/user_id - The format uint64 is not supported by Kiota for the type Integer and the string type will be used.
+Warning: KiotaBuilder Could not create error type for 400 in (null)
+Warning: KiotaBuilder Could not create error type for 400 in (null)
+Warning: KiotaBuilder Could not create error type for 500 in (null)
+Warning: KiotaBuilder Could not create error type for 401 in (null)
+Warning: KiotaBuilder Could not create error type for 500 in (null)

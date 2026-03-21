@@ -1,8 +1,8 @@
 #!/usr/bin/env pwsh
 # Regenerates Kick.Client.Generated from the local OpenAPI spec.
-# Requires: dotnet tool install -g Microsoft.OpenApi.Kiota (kiota)
-# The Kick API swagger is Swagger 2.0 and must be converted to OpenAPI 3.x first.
-# Prerequisites: npm install -g swagger2openapi
+# Prerequisites:
+#   npm install -g swagger2openapi
+#   dotnet tool install -g Microsoft.OpenApi.Kiota
 
 param(
     [string]$SpecPath = "$PSScriptRoot/../openapi/kick-swagger.yaml",
@@ -10,15 +10,15 @@ param(
 )
 
 $SpecPath = Resolve-Path $SpecPath
-$openApiPath = [System.IO.Path]::ChangeExtension($SpecPath, ".openapi3.yaml")
+$OpenApiPath = [System.IO.Path]::ChangeExtension($SpecPath, ".openapi3.yaml")
 
-Write-Host "Converting Swagger 2.0 → OpenAPI 3.0..." -ForegroundColor Cyan
-swagger2openapi $SpecPath --outfile $openApiPath --yaml
+Write-Host "Converting Swagger 2.0 to OpenAPI 3.0..." -ForegroundColor Cyan
+swagger2openapi $SpecPath --outfile $OpenApiPath --yaml
 
 Write-Host "Running Kiota code generation..." -ForegroundColor Cyan
 kiota generate `
     --language csharp `
-    --openapi $openApiPath `
+    --openapi $OpenApiPath `
     --class-name KickApiClient `
     --namespace-name "Kick.Client.Generated" `
     --output $OutputDir `

@@ -1,6 +1,2 @@
-﻿namespace Kick.Client;
-
-public class Class1
-{
-
-}
+// Kick.Client
+// See subdirectories: Authentication/, Webhooks/

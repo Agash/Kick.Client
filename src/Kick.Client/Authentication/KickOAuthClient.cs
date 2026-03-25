@@ -47,6 +47,16 @@ public sealed class KickOAuthClient : IDisposable
         throw new InvalidOperationException("No valid token available. Call ExchangeCodeAsync first.");
     }
 
+    /// <summary>
+    /// Seeds the client with a previously-obtained token (e.g., restored from persisted storage).
+    /// After calling this method, <see cref="GetAccessTokenAsync"/> will return or auto-refresh the token.
+    /// </summary>
+    public void SetToken(KickTokenResponse token)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        _currentToken = token;
+    }
+
     /// <summary>Exchanges an authorization code (PKCE) for an access + refresh token pair.</summary>
     public async Task<KickTokenResponse> ExchangeCodeAsync(
         string code, string codeVerifier, CancellationToken ct = default)

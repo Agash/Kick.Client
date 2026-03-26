@@ -3,6 +3,7 @@ bin/
 obj/
 *.user
 *.suo
+.rsuser
 .vs/
 .vscode/settings.json
 
@@ -15,10 +16,8 @@ packages/
 # Rider
 .idea/
 
-# Generated OpenAPI spec (regenerated at build time)
-openapi/goaffpro.openapi.json
-openapi/goaffpro-user.openapi.json
-openapi/goaffpro-public.openapi.json
+# Generated OpenAPI outputs
+openapi/*.generated.json
 
 # Test results
 TestResults/
@@ -29,8 +28,8 @@ coverage/
 Thumbs.db
 
 # Local development overrides
-examples/GoAffPro.Client.Example/appsettings.development.json
-tests/GoAffPro.Client.IntegrationTests/appsettings.Test.local.json
+samples/Kick.Client.Sample/appsettings.Development.json
+tests/Kick.Client.Tests/appsettings.Test.local.json
 
 # Local LLM/notes docs (not published to GitHub)
 AGENTS.md

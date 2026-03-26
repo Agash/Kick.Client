@@ -1,4 +1,5 @@
 using DevTunnels.Client;
+using Kick.Client;
 using Kick.Client.AspNetCore;
 using Kick.Client.Authentication;
 using Kick.Client.DependencyInjection;

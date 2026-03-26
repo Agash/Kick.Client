@@ -42,7 +42,7 @@ public static class KickWebhookEndpointRouteBuilderExtensions
                 Path = ctx.Request.Path.Value ?? "/",
                 Headers = ctx.Request.Headers.ToDictionary(
                     h => h.Key,
-                    h => h.Value.ToArray(),
+                    h => h.Value.Select(static value => value ?? string.Empty).ToArray(),
                     StringComparer.OrdinalIgnoreCase),
                 Body = body,
             };

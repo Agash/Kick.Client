@@ -135,7 +135,7 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
                 $"{messageId}.{timestamp}.{Encoding.UTF8.GetString(body)}");
             byte[] signatureBytes = Convert.FromBase64String(signatureHeader);
 
-            using RSA rsa = RSA.Create();
+            using var rsa = RSA.Create();
             rsa.ImportFromPem(publicKeyPem);
             byte[] hash = SHA256.HashData(signatureInput);
             return rsa.VerifyHash(hash, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);

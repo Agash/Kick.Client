@@ -6,7 +6,7 @@
     <LangVersion>preview</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-<IsPackable>true</IsPackable>
+    <IsPackable>true</IsPackable>
     <PackageId>Kick.Client</PackageId>
     <Title>Kick.Client</Title>
     <Authors>Agash</Authors>
@@ -14,14 +14,19 @@
     <Description>Typed .NET client library for the Kick Platform API, OAuth 2.1 PKCE flow, and RSA-verified webhooks.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Agash.Webhook.Abstractions\src\Agash.Webhook.Abstractions\Agash.Webhook.Abstractions.csproj" />
     <ProjectReference Include="..\Kick.Client.Generated\Kick.Client.Generated.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.22.1" />
     <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="1.22.1" />
     <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.22.1" />
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.2" PrivateAssets="all" />
   </ItemGroup>
 </Project>

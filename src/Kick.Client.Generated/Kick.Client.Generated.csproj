@@ -16,6 +16,9 @@
     <RepositoryType>git</RepositoryType>
     <!-- Suppress XML doc warnings for generated code -->
     <NoWarn>CS1591</NoWarn>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.22.1" />
@@ -24,5 +27,9 @@
     <PackageReference Include="Microsoft.Kiota.Serialization.Form" Version="1.22.1" />
     <PackageReference Include="Microsoft.Kiota.Serialization.Multipart" Version="1.22.1" />
     <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="1.22.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.2" PrivateAssets="all" />
   </ItemGroup>
 </Project>

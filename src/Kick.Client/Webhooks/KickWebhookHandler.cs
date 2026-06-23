@@ -30,15 +30,19 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
 
     /// <inheritdoc/>
     public Task<WebhookHandleResult<KickWebhookEvent>> HandleAsync(
-        WebhookRequest request, CancellationToken ct = default)
-        => HandleAsync(request, _defaultOptions, ct);
+        WebhookRequest request, CancellationToken cancellationToken = default)
+        => HandleAsync(request, _defaultOptions, cancellationToken);
 
     /// <summary>Handles the webhook with an explicit <paramref name="options"/> override.</summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance", "CA1822:Mark members as static",
+        Justification = "Public instance API; resolved from DI as an instance.")]
     public Task<WebhookHandleResult<KickWebhookEvent>> HandleAsync(
-        WebhookRequest request, KickWebhookOptions options, CancellationToken ct = default)
+        WebhookRequest request, KickWebhookOptions options, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(options);
+        cancellationToken.ThrowIfCancellationRequested();
 
         string? messageId = request.GetFirstHeaderValue(KickWebhookHeaders.MessageId);
         string? subscriptionId = request.GetFirstHeaderValue(KickWebhookHeaders.SubscriptionId);

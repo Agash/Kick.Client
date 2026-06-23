@@ -1,4 +1,6 @@
+#if !NET11_0_OR_GREATER
 using System.Net.Http.Json;
+#endif
 using System.Text.Json;
 
 namespace Kick.Client.Authentication;
@@ -123,7 +125,7 @@ public sealed class KickOAuthClient : IDisposable
         using HttpResponseMessage response = await _http
             .PostAsync($"{_oAuthBaseUrl}/oauth/token", content, ct)
             .ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+        _ = response.EnsureSuccessStatusCode();
 
         KickTokenResponse token = (await response.Content
             .ReadFromJsonAsync<KickTokenResponse>(_jsonOptions, ct)

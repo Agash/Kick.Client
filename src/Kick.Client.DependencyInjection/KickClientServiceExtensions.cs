@@ -1,4 +1,3 @@
-using Kick.Client;
 using Kick.Client.Authentication;
 using Kick.Client.Webhooks;
 using Microsoft.Extensions.DependencyInjection;

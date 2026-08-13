@@ -22,10 +22,10 @@
     <ProjectReference Include="..\Kick.Client.Generated\Kick.Client.Generated.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.22.1" />
-    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="1.22.1" />
-    <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="1.22.1" />
+    <PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="2.0.0" />
     <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
     <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
   </ItemGroup>

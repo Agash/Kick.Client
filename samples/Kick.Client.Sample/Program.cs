@@ -1,4 +1,8 @@
 using DevTunnels.Client;
+using DevTunnels.Client.Authentication;
+using DevTunnels.Client.Hosting;
+using DevTunnels.Client.Ports;
+using DevTunnels.Client.Tunnels;
 using Kick.Client;
 using Kick.Client.AspNetCore;
 using Kick.Client.Authentication;

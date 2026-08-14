@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <IsAotCompatible>true</IsAotCompatible>
@@ -10,7 +10,6 @@
     <IsPackable>true</IsPackable>
     <PackageId>Kick.Client.AspNetCore</PackageId>
     <MinVerTagPrefix>v</MinVerTagPrefix>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Title>Kick.Client.AspNetCore</Title>
     <Authors>Agash</Authors>

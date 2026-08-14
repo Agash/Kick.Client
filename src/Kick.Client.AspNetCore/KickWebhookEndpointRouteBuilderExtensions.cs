@@ -26,7 +26,10 @@ public static class KickWebhookEndpointRouteBuilderExtensions
         ArgumentNullException.ThrowIfNull(optionsFactory);
         ArgumentNullException.ThrowIfNull(onEvent);
 
-        return endpoints.MapPost(pattern, async (HttpContext ctx) =>
+        // Typed as RequestDelegate rather than returning IResult: the IResult-returning overload takes
+        // the Delegate path, which reflects over the delegate signature and so is neither trim-safe nor
+        // AOT-safe. Executing the result against the context keeps the same behaviour on the safe overload.
+        return endpoints.MapPost(pattern, async ctx =>
         {
             CancellationToken ct = ctx.RequestAborted;
             KickWebhookOptions options = await optionsFactory(ctx, ct).ConfigureAwait(false);
@@ -53,16 +56,18 @@ public static class KickWebhookEndpointRouteBuilderExtensions
 
             if (!result.IsAuthenticated)
             {
-                return Results.StatusCode(result.Response.StatusCode);
+                await Results.StatusCode(result.Response.StatusCode).ExecuteAsync(ctx).ConfigureAwait(false);
+                return;
             }
 
             if (!result.IsKnownEvent || result.Event is null)
             {
-                return Results.Ok();
+                await Results.Ok().ExecuteAsync(ctx).ConfigureAwait(false);
+                return;
             }
 
             await onEvent(result.Event, ctx, ct).ConfigureAwait(false);
-            return Results.Ok();
+            await Results.Ok().ExecuteAsync(ctx).ConfigureAwait(false);
         });
     }
 }

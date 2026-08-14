@@ -1,7 +1,7 @@
 #if !NET11_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
-using System.Text.Json;
+using Kick.Client.Serialization;
 
 namespace Kick.Client;
 
@@ -13,7 +13,6 @@ namespace Kick.Client;
 /// </summary>
 public sealed class KickSubscriptionClient
 {
-    private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
     private readonly HttpClient _http;
 
     /// <summary>
@@ -40,16 +39,10 @@ public sealed class KickSubscriptionClient
         ArgumentException.ThrowIfNullOrWhiteSpace(broadcasterId);
         ArgumentException.ThrowIfNullOrWhiteSpace(webhookUrl);
 
-        var body = new
-        {
-            type = eventType,
-            version,
-            broadcaster_user_id = broadcasterId,
-            webhook_url = webhookUrl,
-        };
+        var body = new KickSubscriptionRequest(eventType, version, broadcasterId, webhookUrl);
 
         using HttpResponseMessage response = await _http
-            .PostAsJsonAsync("/public/v1/events/subscriptions", body, _json, ct)
+            .PostAsJsonAsync("/public/v1/events/subscriptions", body, KickJsonContext.Default.KickSubscriptionRequest, ct)
             .ConfigureAwait(false);
 
         return new KickSubscriptionResult(

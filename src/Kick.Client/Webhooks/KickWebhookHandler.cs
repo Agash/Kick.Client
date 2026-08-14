@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Kick.Client.Serialization;
 using Agash.Webhook.Abstractions;
 
 namespace Kick.Client.Webhooks;
@@ -12,8 +13,6 @@ namespace Kick.Client.Webhooks;
 /// </summary>
 public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
 {
-    private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
-
     private readonly KickWebhookOptions _defaultOptions;
 
     /// <summary>
@@ -157,23 +156,23 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
             return eventType switch
             {
                 KickEventTypes.ChatMessageSent =>
-                    JsonSerializer.Deserialize<KickChatMessagePayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickChatMessagePayload),
                 KickEventTypes.ChannelFollowed =>
-                    JsonSerializer.Deserialize<KickChannelFollowedPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickChannelFollowedPayload),
                 KickEventTypes.SubscriptionNew or KickEventTypes.SubscriptionRenewal =>
-                    JsonSerializer.Deserialize<KickSubscriptionPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickSubscriptionPayload),
                 KickEventTypes.SubscriptionGifts =>
-                    JsonSerializer.Deserialize<KickSubscriptionGiftsPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickSubscriptionGiftsPayload),
                 KickEventTypes.RewardRedemptionUpdated =>
-                    JsonSerializer.Deserialize<KickRewardRedemptionPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickRewardRedemptionPayload),
                 KickEventTypes.LivestreamStatusUpdated =>
-                    JsonSerializer.Deserialize<KickLivestreamStatusPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickLivestreamStatusPayload),
                 KickEventTypes.LivestreamMetadataUpdated =>
-                    JsonSerializer.Deserialize<KickLivestreamMetadataPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickLivestreamMetadataPayload),
                 KickEventTypes.ModerationBanned =>
-                    JsonSerializer.Deserialize<KickModerationBannedPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickModerationBannedPayload),
                 KickEventTypes.KicksGifted =>
-                    JsonSerializer.Deserialize<KickKicksGiftedPayload>(body, _json),
+                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickKicksGiftedPayload),
                 _ => null,
             };
         }

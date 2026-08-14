@@ -1,7 +1,7 @@
 #if !NET11_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
-using System.Text.Json;
+using Kick.Client.Serialization;
 
 namespace Kick.Client.Authentication;
 
@@ -10,8 +10,6 @@ namespace Kick.Client.Authentication;
 /// </summary>
 public sealed class KickOAuthClient : IDisposable
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-
     private readonly HttpClient _http;
     private readonly KickOAuthOptions _options;
     private readonly string _oAuthBaseUrl;
@@ -128,7 +126,7 @@ public sealed class KickOAuthClient : IDisposable
         _ = response.EnsureSuccessStatusCode();
 
         KickTokenResponse token = (await response.Content
-            .ReadFromJsonAsync<KickTokenResponse>(_jsonOptions, ct)
+            .ReadFromJsonAsync(KickJsonContext.Default.KickTokenResponse, ct)
             .ConfigureAwait(false))!;
         token.ExpiresAtUtc = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresInSeconds);
         return token;

@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Kiota.Serialization.Text" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
+    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
   </ItemGroup>
 </Project>

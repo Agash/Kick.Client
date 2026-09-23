@@ -1,8 +1,4 @@
 using Kick.Client.Serialization;
-#if !NET11_0_OR_GREATER
-using System.Net.Http.Json;
-#endif
-
 
 namespace Kick.Client.Authentication;
 

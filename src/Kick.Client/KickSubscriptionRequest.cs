@@ -14,4 +14,5 @@ internal sealed record KickSubscriptionRequest(
     [property: JsonPropertyName("type")] string Type,
     [property: JsonPropertyName("version")] string Version,
     [property: JsonPropertyName("broadcaster_user_id")] string BroadcasterUserId,
-    [property: JsonPropertyName("webhook_url")] string WebhookUrl);
+    [property: JsonPropertyName("webhook_url")] string WebhookUrl
+);

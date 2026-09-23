@@ -1,7 +1,8 @@
+using Kick.Client.Serialization;
 #if !NET11_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
-using Kick.Client.Serialization;
+
 
 namespace Kick.Client.Authentication;
 
@@ -21,7 +22,11 @@ public sealed class KickOAuthClient : IDisposable
     /// <param name="http">The <see cref="HttpClient"/> to use for token requests.</param>
     /// <param name="options">OAuth configuration (client ID, redirect URI, scopes).</param>
     /// <param name="oAuthBaseUrl">Base URL of the Kick identity server. Defaults to <c>https://id.kick.com</c>.</param>
-    public KickOAuthClient(HttpClient http, KickOAuthOptions options, string oAuthBaseUrl = "https://id.kick.com")
+    public KickOAuthClient(
+        HttpClient http,
+        KickOAuthOptions options,
+        string oAuthBaseUrl = "https://id.kick.com"
+    )
     {
         ArgumentNullException.ThrowIfNull(http);
         ArgumentNullException.ThrowIfNull(options);
@@ -33,7 +38,10 @@ public sealed class KickOAuthClient : IDisposable
     /// <summary>Returns the current access token, refreshing automatically if close to expiry.</summary>
     public async ValueTask<string> GetAccessTokenAsync(CancellationToken ct = default)
     {
-        if (_currentToken is not null && _currentToken.ExpiresAtUtc > DateTimeOffset.UtcNow.AddMinutes(2))
+        if (
+            _currentToken is not null
+            && _currentToken.ExpiresAtUtc > DateTimeOffset.UtcNow.AddMinutes(2)
+        )
         {
             return _currentToken.AccessToken;
         }
@@ -44,7 +52,9 @@ public sealed class KickOAuthClient : IDisposable
             return _currentToken.AccessToken;
         }
 
-        throw new InvalidOperationException("No valid token available. Call ExchangeCodeAsync first.");
+        throw new InvalidOperationException(
+            "No valid token available. Call ExchangeCodeAsync first."
+        );
     }
 
     /// <summary>
@@ -59,7 +69,10 @@ public sealed class KickOAuthClient : IDisposable
 
     /// <summary>Exchanges an authorization code (PKCE) for an access + refresh token pair.</summary>
     public async Task<KickTokenResponse> ExchangeCodeAsync(
-        string code, string codeVerifier, CancellationToken ct = default)
+        string code,
+        string codeVerifier,
+        CancellationToken ct = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(code);
         ArgumentException.ThrowIfNullOrWhiteSpace(codeVerifier);
@@ -86,7 +99,9 @@ public sealed class KickOAuthClient : IDisposable
     {
         if (_options.ClientSecret is null)
         {
-            throw new InvalidOperationException("ClientSecret is required for client_credentials grant.");
+            throw new InvalidOperationException(
+                "ClientSecret is required for client_credentials grant."
+            );
         }
 
         Dictionary<string, string> form = new()
@@ -100,7 +115,10 @@ public sealed class KickOAuthClient : IDisposable
         return _currentToken;
     }
 
-    private async Task<KickTokenResponse> RefreshTokenAsync(string refreshToken, CancellationToken ct)
+    private async Task<KickTokenResponse> RefreshTokenAsync(
+        string refreshToken,
+        CancellationToken ct
+    )
     {
         Dictionary<string, string> form = new()
         {
@@ -117,7 +135,9 @@ public sealed class KickOAuthClient : IDisposable
     }
 
     private async Task<KickTokenResponse> PostTokenFormAsync(
-        Dictionary<string, string> form, CancellationToken ct)
+        Dictionary<string, string> form,
+        CancellationToken ct
+    )
     {
         using FormUrlEncodedContent content = new(form);
         using HttpResponseMessage response = await _http
@@ -125,9 +145,11 @@ public sealed class KickOAuthClient : IDisposable
             .ConfigureAwait(false);
         _ = response.EnsureSuccessStatusCode();
 
-        KickTokenResponse token = (await response.Content
-            .ReadFromJsonAsync(KickJsonContext.Default.KickTokenResponse, ct)
-            .ConfigureAwait(false))!;
+        KickTokenResponse token = (
+            await response
+                .Content.ReadFromJsonAsync(KickJsonContext.Default.KickTokenResponse, ct)
+                .ConfigureAwait(false)
+        )!;
         token.ExpiresAtUtc = DateTimeOffset.UtcNow.AddSeconds(token.ExpiresInSeconds);
         return token;
     }

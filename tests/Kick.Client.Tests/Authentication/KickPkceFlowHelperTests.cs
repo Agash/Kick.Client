@@ -10,8 +10,8 @@ public sealed class KickPkceFlowHelperTests
     private const string RfcChallenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
 
     [TestMethod]
-    public void DeriveCodeChallenge_MatchesRfc7636Vector()
-        => Assert.AreEqual(RfcChallenge, KickPkceFlowHelper.DeriveCodeChallenge(RfcVerifier));
+    public void DeriveCodeChallenge_MatchesRfc7636Vector() =>
+        Assert.AreEqual(RfcChallenge, KickPkceFlowHelper.DeriveCodeChallenge(RfcVerifier));
 
     [TestMethod]
     public void DeriveCodeChallenge_IsDeterministic()
@@ -26,8 +26,8 @@ public sealed class KickPkceFlowHelperTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow("   ")]
-    public void DeriveCodeChallenge_WhenVerifierIsBlank_Throws(string? verifier)
-        => Assert.Throws<ArgumentException>(() => KickPkceFlowHelper.DeriveCodeChallenge(verifier!));
+    public void DeriveCodeChallenge_WhenVerifierIsBlank_Throws(string? verifier) =>
+        Assert.Throws<ArgumentException>(() => KickPkceFlowHelper.DeriveCodeChallenge(verifier!));
 
     [TestMethod]
     public void GenerateCodeVerifier_IsBase64UrlWithoutPadding()
@@ -52,23 +52,30 @@ public sealed class KickPkceFlowHelperTests
     public void GenerateCodeVerifier_ProducesDistinctValues()
     {
         string[] verifiers =
-            [.. Enumerable.Range(0, 32).Select(_ => KickPkceFlowHelper.GenerateCodeVerifier())];
+        [
+            .. Enumerable.Range(0, 32).Select(_ => KickPkceFlowHelper.GenerateCodeVerifier()),
+        ];
 
         Assert.AreAllDistinct(verifiers);
     }
 
-    private static KickOAuthOptions Options => new()
-    {
-        ClientId = "client-123",
-        RedirectUri = "https://example.test/callback",
-        Scopes = "user:read channel:read",
-    };
+    private static KickOAuthOptions Options =>
+        new()
+        {
+            ClientId = "client-123",
+            RedirectUri = "https://example.test/callback",
+            Scopes = "user:read channel:read",
+        };
 
     [TestMethod]
     public void BuildAuthorizationUrl_IncludesTheS256PkceParameters()
     {
         string url = KickPkceFlowHelper.BuildAuthorizationUrl(
-            "https://id.kick.test", Options, RfcChallenge, "state-xyz");
+            "https://id.kick.test",
+            Options,
+            RfcChallenge,
+            "state-xyz"
+        );
 
         Assert.Contains($"code_challenge={RfcChallenge}", url);
         Assert.Contains("code_challenge_method=S256", url);
@@ -81,7 +88,11 @@ public sealed class KickPkceFlowHelperTests
     public void BuildAuthorizationUrl_PercentEncodesRedirectAndScopes()
     {
         string url = KickPkceFlowHelper.BuildAuthorizationUrl(
-            "https://id.kick.test", Options, RfcChallenge, "state-xyz");
+            "https://id.kick.test",
+            Options,
+            RfcChallenge,
+            "state-xyz"
+        );
 
         Assert.Contains("redirect_uri=https%3A%2F%2Fexample.test%2Fcallback", url);
         Assert.Contains("scope=user%3Aread%20channel%3Aread", url);
@@ -91,7 +102,11 @@ public sealed class KickPkceFlowHelperTests
     public void BuildAuthorizationUrl_TrimsTrailingSlashFromBaseUrl()
     {
         string url = KickPkceFlowHelper.BuildAuthorizationUrl(
-            "https://id.kick.test/", Options, RfcChallenge, "state-xyz");
+            "https://id.kick.test/",
+            Options,
+            RfcChallenge,
+            "state-xyz"
+        );
 
         Assert.StartsWith("https://id.kick.test/oauth/authorize?", url);
     }
@@ -100,12 +115,19 @@ public sealed class KickPkceFlowHelperTests
     [DataRow(null)]
     [DataRow("")]
     [DataRow("   ")]
-    public void BuildAuthorizationUrl_WhenBaseUrlIsBlank_Throws(string? baseUrl)
-        => Assert.Throws<ArgumentException>(
-            () => KickPkceFlowHelper.BuildAuthorizationUrl(baseUrl!, Options, RfcChallenge, "state"));
+    public void BuildAuthorizationUrl_WhenBaseUrlIsBlank_Throws(string? baseUrl) =>
+        Assert.Throws<ArgumentException>(() =>
+            KickPkceFlowHelper.BuildAuthorizationUrl(baseUrl!, Options, RfcChallenge, "state")
+        );
 
     [TestMethod]
-    public void BuildAuthorizationUrl_WhenOptionsAreNull_Throws()
-        => Assert.Throws<ArgumentNullException>(
-            () => KickPkceFlowHelper.BuildAuthorizationUrl("https://id.kick.test", null!, RfcChallenge, "state"));
+    public void BuildAuthorizationUrl_WhenOptionsAreNull_Throws() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            KickPkceFlowHelper.BuildAuthorizationUrl(
+                "https://id.kick.test",
+                null!,
+                RfcChallenge,
+                "state"
+            )
+        );
 }

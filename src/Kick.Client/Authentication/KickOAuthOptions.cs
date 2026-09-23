@@ -30,7 +30,12 @@ public sealed class KickOAuthOptions
     /// <param name="redirectUri">Redirect URI registered with the application.</param>
     /// <returns>A new <see cref="KickOAuthOptions"/> instance for chat bot use.</returns>
     public static KickOAuthOptions ForChatBot(string clientId, string redirectUri) =>
-        new() { ClientId = clientId, RedirectUri = redirectUri, Scopes = KickScopes.ChatBot };
+        new()
+        {
+            ClientId = clientId,
+            RedirectUri = redirectUri,
+            Scopes = KickScopes.ChatBot,
+        };
 
     /// <summary>
     /// Creates a <see cref="KickOAuthOptions"/> pre-configured with <see cref="KickScopes.WebhookProvider"/> scopes.
@@ -39,5 +44,10 @@ public sealed class KickOAuthOptions
     /// <param name="redirectUri">Redirect URI registered with the application.</param>
     /// <returns>A new <see cref="KickOAuthOptions"/> instance for webhook-based provider use.</returns>
     public static KickOAuthOptions ForWebhookProvider(string clientId, string redirectUri) =>
-        new() { ClientId = clientId, RedirectUri = redirectUri, Scopes = KickScopes.WebhookProvider };
+        new()
+        {
+            ClientId = clientId,
+            RedirectUri = redirectUri,
+            Scopes = KickScopes.WebhookProvider,
+        };
 }

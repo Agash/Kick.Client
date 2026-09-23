@@ -20,7 +20,8 @@ public static class KickWebhookEndpointRouteBuilderExtensions
         this IEndpointRouteBuilder endpoints,
         string pattern,
         Func<HttpContext, CancellationToken, Task<KickWebhookOptions>> optionsFactory,
-        Func<KickWebhookEvent, HttpContext, CancellationToken, Task> onEvent)
+        Func<KickWebhookEvent, HttpContext, CancellationToken, Task> onEvent
+    )
     {
         ArgumentNullException.ThrowIfNull(endpoints);
         ArgumentNullException.ThrowIfNull(optionsFactory);
@@ -29,45 +30,54 @@ public static class KickWebhookEndpointRouteBuilderExtensions
         // Typed as RequestDelegate rather than returning IResult: the IResult-returning overload takes
         // the Delegate path, which reflects over the delegate signature and so is neither trim-safe nor
         // AOT-safe. Executing the result against the context keeps the same behaviour on the safe overload.
-        return endpoints.MapPost(pattern, async ctx =>
-        {
-            CancellationToken ct = ctx.RequestAborted;
-            KickWebhookOptions options = await optionsFactory(ctx, ct).ConfigureAwait(false);
-
-            ctx.Request.EnableBuffering();
-            using MemoryStream ms = new();
-            await ctx.Request.Body.CopyToAsync(ms, ct).ConfigureAwait(false);
-            byte[] body = ms.ToArray();
-
-            WebhookRequest webhookRequest = new()
+        return endpoints.MapPost(
+            pattern,
+            async ctx =>
             {
-                Method = ctx.Request.Method,
-                Path = ctx.Request.Path.Value ?? "/",
-                Headers = ctx.Request.Headers.ToDictionary(
-                    h => h.Key,
-                    h => h.Value.Select(static value => value ?? string.Empty).ToArray(),
-                    StringComparer.OrdinalIgnoreCase),
-                Body = body,
-            };
+                CancellationToken ct = ctx.RequestAborted;
+                KickWebhookOptions options = await optionsFactory(ctx, ct).ConfigureAwait(false);
 
-            KickWebhookHandler handler = ctx.RequestServices.GetRequiredService<KickWebhookHandler>();
-            WebhookHandleResult<KickWebhookEvent> result =
-                await handler.HandleAsync(webhookRequest, options, ct).ConfigureAwait(false);
+                ctx.Request.EnableBuffering();
+                using MemoryStream ms = new();
+                await ctx.Request.Body.CopyToAsync(ms, ct).ConfigureAwait(false);
+                byte[] body = ms.ToArray();
 
-            if (!result.IsAuthenticated)
-            {
-                await Results.StatusCode(result.Response.StatusCode).ExecuteAsync(ctx).ConfigureAwait(false);
-                return;
-            }
+                WebhookRequest webhookRequest = new()
+                {
+                    Method = ctx.Request.Method,
+                    Path = ctx.Request.Path.Value ?? "/",
+                    Headers = ctx.Request.Headers.ToDictionary(
+                        h => h.Key,
+                        h => h.Value.Select(static value => value ?? string.Empty).ToArray(),
+                        StringComparer.OrdinalIgnoreCase
+                    ),
+                    Body = body,
+                };
 
-            if (!result.IsKnownEvent || result.Event is null)
-            {
+                KickWebhookHandler handler =
+                    ctx.RequestServices.GetRequiredService<KickWebhookHandler>();
+                WebhookHandleResult<KickWebhookEvent> result = await handler
+                    .HandleAsync(webhookRequest, options, ct)
+                    .ConfigureAwait(false);
+
+                if (!result.IsAuthenticated)
+                {
+                    await Results
+                        .StatusCode(result.Response.StatusCode)
+                        .ExecuteAsync(ctx)
+                        .ConfigureAwait(false);
+                    return;
+                }
+
+                if (!result.IsKnownEvent || result.Event is null)
+                {
+                    await Results.Ok().ExecuteAsync(ctx).ConfigureAwait(false);
+                    return;
+                }
+
+                await onEvent(result.Event, ctx, ct).ConfigureAwait(false);
                 await Results.Ok().ExecuteAsync(ctx).ConfigureAwait(false);
-                return;
             }
-
-            await onEvent(result.Event, ctx, ct).ConfigureAwait(false);
-            await Results.Ok().ExecuteAsync(ctx).ConfigureAwait(false);
-        });
+        );
     }
 }

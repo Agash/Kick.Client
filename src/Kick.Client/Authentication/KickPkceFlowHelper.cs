@@ -28,7 +28,8 @@ public static class KickPkceFlowHelper
         string oAuthBaseUrl,
         KickOAuthOptions options,
         string codeChallenge,
-        string state)
+        string state
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(oAuthBaseUrl);
         ArgumentNullException.ThrowIfNull(options);
@@ -39,19 +40,16 @@ public static class KickPkceFlowHelper
         string encodedScopes = Uri.EscapeDataString(options.Scopes);
         string encodedRedirect = Uri.EscapeDataString(options.RedirectUri);
 
-        return $"{baseUrl}/oauth/authorize" +
-               $"?client_id={options.ClientId}" +
-               $"&response_type=code" +
-               $"&redirect_uri={encodedRedirect}" +
-               $"&state={state}" +
-               $"&scope={encodedScopes}" +
-               $"&code_challenge={codeChallenge}" +
-               $"&code_challenge_method=S256";
+        return $"{baseUrl}/oauth/authorize"
+            + $"?client_id={options.ClientId}"
+            + $"&response_type=code"
+            + $"&redirect_uri={encodedRedirect}"
+            + $"&state={state}"
+            + $"&scope={encodedScopes}"
+            + $"&code_challenge={codeChallenge}"
+            + $"&code_challenge_method=S256";
     }
 
     private static string Base64UrlEncode(byte[] bytes) =>
-        Convert.ToBase64String(bytes)
-            .TrimEnd('=')
-            .Replace('+', '-')
-            .Replace('/', '_');
+        Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 }

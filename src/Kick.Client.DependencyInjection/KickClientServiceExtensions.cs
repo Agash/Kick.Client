@@ -14,7 +14,8 @@ public static class KickClientServiceExtensions
     public static IServiceCollection AddKickClient(
         this IServiceCollection services,
         KickClientOptions? options = null,
-        KickWebhookOptions? webhookOptions = null)
+        KickWebhookOptions? webhookOptions = null
+    )
     {
         ArgumentNullException.ThrowIfNull(services);
         options ??= new KickClientOptions();

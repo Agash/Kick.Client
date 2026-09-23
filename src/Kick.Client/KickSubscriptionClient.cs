@@ -1,7 +1,8 @@
+using Kick.Client.Serialization;
 #if !NET11_0_OR_GREATER
 using System.Net.Http.Json;
 #endif
-using Kick.Client.Serialization;
+
 
 namespace Kick.Client;
 
@@ -33,7 +34,8 @@ public sealed class KickSubscriptionClient
         string version,
         string broadcasterId,
         string webhookUrl,
-        CancellationToken ct = default)
+        CancellationToken ct = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventType);
         ArgumentException.ThrowIfNullOrWhiteSpace(broadcasterId);
@@ -42,14 +44,20 @@ public sealed class KickSubscriptionClient
         var body = new KickSubscriptionRequest(eventType, version, broadcasterId, webhookUrl);
 
         using HttpResponseMessage response = await _http
-            .PostAsJsonAsync("/public/v1/events/subscriptions", body, KickJsonContext.Default.KickSubscriptionRequest, ct)
+            .PostAsJsonAsync(
+                "/public/v1/events/subscriptions",
+                body,
+                KickJsonContext.Default.KickSubscriptionRequest,
+                ct
+            )
             .ConfigureAwait(false);
 
         return new KickSubscriptionResult(
             IsSuccess: response.IsSuccessStatusCode,
             StatusCode: (int)response.StatusCode,
             EventType: eventType,
-            BroadcasterId: broadcasterId);
+            BroadcasterId: broadcasterId
+        );
     }
 
     /// <summary>Unsubscribes from a Kick webhook event type for a broadcaster.</summary>
@@ -57,15 +65,17 @@ public sealed class KickSubscriptionClient
         string eventType,
         string version,
         string broadcasterId,
-        CancellationToken ct = default)
+        CancellationToken ct = default
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(eventType);
         ArgumentException.ThrowIfNullOrWhiteSpace(broadcasterId);
 
-        string url = $"/public/v1/events/subscriptions" +
-                     $"?type={Uri.EscapeDataString(eventType)}" +
-                     $"&version={Uri.EscapeDataString(version)}" +
-                     $"&broadcaster_user_id={Uri.EscapeDataString(broadcasterId)}";
+        string url =
+            $"/public/v1/events/subscriptions"
+            + $"?type={Uri.EscapeDataString(eventType)}"
+            + $"&version={Uri.EscapeDataString(version)}"
+            + $"&broadcaster_user_id={Uri.EscapeDataString(broadcasterId)}";
 
         using HttpResponseMessage response = await _http.DeleteAsync(url, ct).ConfigureAwait(false);
         return response.IsSuccessStatusCode;
@@ -78,7 +88,8 @@ public sealed class KickSubscriptionClient
     public async Task<IReadOnlyList<KickSubscriptionResult>> SubscribeAllAsync(
         string broadcasterId,
         string webhookUrl,
-        CancellationToken ct = default)
+        CancellationToken ct = default
+    )
     {
         string[] eventTypes =
         [
@@ -97,8 +108,10 @@ public sealed class KickSubscriptionClient
         List<KickSubscriptionResult> results = new(eventTypes.Length);
         foreach (string eventType in eventTypes)
         {
-            results.Add(await SubscribeAsync(eventType, "1", broadcasterId, webhookUrl, ct)
-                .ConfigureAwait(false));
+            results.Add(
+                await SubscribeAsync(eventType, "1", broadcasterId, webhookUrl, ct)
+                    .ConfigureAwait(false)
+            );
         }
 
         return results;
@@ -136,4 +149,5 @@ public sealed record KickSubscriptionResult(
     bool IsSuccess,
     int StatusCode,
     string EventType,
-    string BroadcasterId);
+    string BroadcasterId
+);

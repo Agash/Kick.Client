@@ -21,8 +21,8 @@
     <RepositoryUrl>https://github.com/Agash/Kick.Client</RepositoryUrl>
     <PackageTags>kick;kick-api;livestreaming;chat;oauth2;webhooks;api-client;dotnet;csharp;aot</PackageTags>
     <PackageProjectUrl>https://github.com/Agash/Kick.Client</PackageProjectUrl>
-    <GenerateDocumentationFile Condition="'$(IsPackable)' == 'true'">true</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="'$(IsPackable)' == 'true'"
+      >true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
 </Project>

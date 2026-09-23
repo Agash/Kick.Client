@@ -23,7 +23,8 @@ public sealed class KickBearerAuthenticationProvider : IAuthenticationProvider
     public async Task AuthenticateRequestAsync(
         RequestInformation request,
         Dictionary<string, object>? additionalAuthenticationContext = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(request);
         string token = await _tokenFactory(cancellationToken).ConfigureAwait(false);

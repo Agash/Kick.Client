@@ -53,16 +53,24 @@ public static class KickScopes
     /// Scopes for a full webhook-based provider (events, metadata, reward management, moderation):
     /// <c>user:read channel:read channel:write channel:rewards:read channel:rewards:write events:subscribe moderation:ban kicks:read</c>.
     /// </summary>
-    public static string WebhookProvider { get; } = Join(
-        UserRead, ChannelRead, ChannelWrite,
-        ChannelRewardsRead, ChannelRewardsWrite,
-        EventsSubscribe, ModerationBan, KicksRead);
+    public static string WebhookProvider { get; } =
+        Join(
+            UserRead,
+            ChannelRead,
+            ChannelWrite,
+            ChannelRewardsRead,
+            ChannelRewardsWrite,
+            EventsSubscribe,
+            ModerationBan,
+            KicksRead
+        );
 
     /// <summary>
     /// Read-only scopes that grant no write or moderation access:
     /// <c>user:read channel:read channel:rewards:read kicks:read</c>.
     /// </summary>
-    public static string ReadOnly { get; } = Join(UserRead, ChannelRead, ChannelRewardsRead, KicksRead);
+    public static string ReadOnly { get; } =
+        Join(UserRead, ChannelRead, ChannelRewardsRead, KicksRead);
 
     // ─── Helper ───────────────────────────────────────────────────────────────
 

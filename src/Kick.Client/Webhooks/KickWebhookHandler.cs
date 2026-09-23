@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Kick.Client.Serialization;
 using Agash.Webhook.Abstractions;
+using Kick.Client.Serialization;
 
 namespace Kick.Client.Webhooks;
 
@@ -29,15 +29,21 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
 
     /// <inheritdoc/>
     public Task<WebhookHandleResult<KickWebhookEvent>> HandleAsync(
-        WebhookRequest request, CancellationToken cancellationToken = default)
-        => HandleAsync(request, _defaultOptions, cancellationToken);
+        WebhookRequest request,
+        CancellationToken cancellationToken = default
+    ) => HandleAsync(request, _defaultOptions, cancellationToken);
 
     /// <summary>Handles the webhook with an explicit <paramref name="options"/> override.</summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Performance", "CA1822:Mark members as static",
-        Justification = "Public instance API; resolved from DI as an instance.")]
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Public instance API; resolved from DI as an instance."
+    )]
     public Task<WebhookHandleResult<KickWebhookEvent>> HandleAsync(
-        WebhookRequest request, KickWebhookOptions options, CancellationToken cancellationToken = default)
+        WebhookRequest request,
+        KickWebhookOptions options,
+        CancellationToken cancellationToken = default
+    )
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(options);
@@ -50,40 +56,60 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
         string? eventType = request.GetFirstHeaderValue(KickWebhookHeaders.EventType);
         string? eventVersion = request.GetFirstHeaderValue(KickWebhookHeaders.EventVersion);
 
-        if (string.IsNullOrEmpty(messageId) || string.IsNullOrEmpty(timestamp)
-            || string.IsNullOrEmpty(eventType))
+        if (
+            string.IsNullOrEmpty(messageId)
+            || string.IsNullOrEmpty(timestamp)
+            || string.IsNullOrEmpty(eventType)
+        )
         {
-            return Task.FromResult(new WebhookHandleResult<KickWebhookEvent>
-            {
-                Response = WebhookResponse.PlainText(400, "Missing required Kick-Event-* headers."),
-                IsAuthenticated = false,
-                IsKnownEvent = false,
-                FailureReason = "Missing required Kick-Event-* headers.",
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KickWebhookEvent>
+                {
+                    Response = WebhookResponse.PlainText(
+                        400,
+                        "Missing required Kick-Event-* headers."
+                    ),
+                    IsAuthenticated = false,
+                    IsKnownEvent = false,
+                    FailureReason = "Missing required Kick-Event-* headers.",
+                }
+            );
         }
 
         if (options.RequireValidSignature)
         {
             if (string.IsNullOrEmpty(signature))
             {
-                return Task.FromResult(new WebhookHandleResult<KickWebhookEvent>
-                {
-                    Response = WebhookResponse.Empty(401),
-                    IsAuthenticated = false,
-                    IsKnownEvent = false,
-                    FailureReason = "Missing Kick-Event-Signature header.",
-                });
+                return Task.FromResult(
+                    new WebhookHandleResult<KickWebhookEvent>
+                    {
+                        Response = WebhookResponse.Empty(401),
+                        IsAuthenticated = false,
+                        IsKnownEvent = false,
+                        FailureReason = "Missing Kick-Event-Signature header.",
+                    }
+                );
             }
 
-            if (!VerifySignature(request.Body, messageId, timestamp, signature, options.PublicKeyPem))
+            if (
+                !VerifySignature(
+                    request.Body,
+                    messageId,
+                    timestamp,
+                    signature,
+                    options.PublicKeyPem
+                )
+            )
             {
-                return Task.FromResult(new WebhookHandleResult<KickWebhookEvent>
-                {
-                    Response = WebhookResponse.Empty(401),
-                    IsAuthenticated = false,
-                    IsKnownEvent = false,
-                    FailureReason = "Kick-Event-Signature verification failed.",
-                });
+                return Task.FromResult(
+                    new WebhookHandleResult<KickWebhookEvent>
+                    {
+                        Response = WebhookResponse.Empty(401),
+                        IsAuthenticated = false,
+                        IsKnownEvent = false,
+                        FailureReason = "Kick-Event-Signature verification failed.",
+                    }
+                );
             }
         }
 
@@ -95,12 +121,14 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
         object? payload = DeserializePayload(eventType, request.Body);
         if (payload is null)
         {
-            return Task.FromResult(new WebhookHandleResult<KickWebhookEvent>
-            {
-                Response = WebhookResponse.Empty(200),
-                IsAuthenticated = true,
-                IsKnownEvent = false,
-            });
+            return Task.FromResult(
+                new WebhookHandleResult<KickWebhookEvent>
+                {
+                    Response = WebhookResponse.Empty(200),
+                    IsAuthenticated = true,
+                    IsKnownEvent = false,
+                }
+            );
         }
 
         KickWebhookEvent evt = new()
@@ -114,17 +142,24 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
             Payload = payload,
         };
 
-        return Task.FromResult(new WebhookHandleResult<KickWebhookEvent>
-        {
-            Response = WebhookResponse.Empty(200),
-            IsAuthenticated = true,
-            IsKnownEvent = true,
-            Event = evt,
-        });
+        return Task.FromResult(
+            new WebhookHandleResult<KickWebhookEvent>
+            {
+                Response = WebhookResponse.Empty(200),
+                IsAuthenticated = true,
+                IsKnownEvent = true,
+                Event = evt,
+            }
+        );
     }
 
     private static bool VerifySignature(
-        byte[] body, string messageId, string timestamp, string signatureHeader, string? publicKeyPem)
+        byte[] body,
+        string messageId,
+        string timestamp,
+        string signatureHeader,
+        string? publicKeyPem
+    )
     {
         if (string.IsNullOrEmpty(publicKeyPem))
         {
@@ -135,13 +170,19 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
         {
             // Signature input: "{messageId}.{timestamp}.{rawBody}"
             byte[] signatureInput = Encoding.UTF8.GetBytes(
-                $"{messageId}.{timestamp}.{Encoding.UTF8.GetString(body)}");
+                $"{messageId}.{timestamp}.{Encoding.UTF8.GetString(body)}"
+            );
             byte[] signatureBytes = Convert.FromBase64String(signatureHeader);
 
             using var rsa = RSA.Create();
             rsa.ImportFromPem(publicKeyPem);
             byte[] hash = SHA256.HashData(signatureInput);
-            return rsa.VerifyHash(hash, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            return rsa.VerifyHash(
+                hash,
+                signatureBytes,
+                HashAlgorithmName.SHA256,
+                RSASignaturePadding.Pkcs1
+            );
         }
         catch
         {
@@ -155,24 +196,43 @@ public sealed class KickWebhookHandler : IWebhookHandler<KickWebhookEvent>
         {
             return eventType switch
             {
-                KickEventTypes.ChatMessageSent =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickChatMessagePayload),
-                KickEventTypes.ChannelFollowed =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickChannelFollowedPayload),
+                KickEventTypes.ChatMessageSent => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickChatMessagePayload
+                ),
+                KickEventTypes.ChannelFollowed => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickChannelFollowedPayload
+                ),
                 KickEventTypes.SubscriptionNew or KickEventTypes.SubscriptionRenewal =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickSubscriptionPayload),
-                KickEventTypes.SubscriptionGifts =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickSubscriptionGiftsPayload),
-                KickEventTypes.RewardRedemptionUpdated =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickRewardRedemptionPayload),
-                KickEventTypes.LivestreamStatusUpdated =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickLivestreamStatusPayload),
-                KickEventTypes.LivestreamMetadataUpdated =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickLivestreamMetadataPayload),
-                KickEventTypes.ModerationBanned =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickModerationBannedPayload),
-                KickEventTypes.KicksGifted =>
-                    JsonSerializer.Deserialize(body, KickJsonContext.Default.KickKicksGiftedPayload),
+                    JsonSerializer.Deserialize(
+                        body,
+                        KickJsonContext.Default.KickSubscriptionPayload
+                    ),
+                KickEventTypes.SubscriptionGifts => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickSubscriptionGiftsPayload
+                ),
+                KickEventTypes.RewardRedemptionUpdated => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickRewardRedemptionPayload
+                ),
+                KickEventTypes.LivestreamStatusUpdated => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickLivestreamStatusPayload
+                ),
+                KickEventTypes.LivestreamMetadataUpdated => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickLivestreamMetadataPayload
+                ),
+                KickEventTypes.ModerationBanned => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickModerationBannedPayload
+                ),
+                KickEventTypes.KicksGifted => JsonSerializer.Deserialize(
+                    body,
+                    KickJsonContext.Default.KickKicksGiftedPayload
+                ),
                 _ => null,
             };
         }

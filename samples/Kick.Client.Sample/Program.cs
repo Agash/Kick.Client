@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using DevTunnels.Client;
 using DevTunnels.Client.Authentication;
 using DevTunnels.Client.Hosting;
@@ -11,11 +13,13 @@ using Kick.Client.Webhooks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Spectre.Console;
-using System.Collections.Concurrent;
-using System.Diagnostics;
 
 CancellationTokenSource shutdown = new();
-Console.CancelKeyPress += (_, e) => { e.Cancel = true; shutdown.Cancel(); };
+Console.CancelKeyPress += (_, e) =>
+{
+    e.Cancel = true;
+    shutdown.Cancel();
+};
 
 try
 {
@@ -44,7 +48,10 @@ internal static class SampleApplication
         string webhookPath = AnsiConsole.Ask("Webhook path", "/kick/webhook");
         string clientId = AnsiConsole.Prompt(new TextPrompt<string>("Client ID:").Secret(' '));
         string clientSecret = AnsiConsole.Prompt(
-            new TextPrompt<string>("Client Secret (blank for public client):").AllowEmpty().Secret(' '));
+            new TextPrompt<string>("Client Secret (blank for public client):")
+                .AllowEmpty()
+                .Secret(' ')
+        );
         string broadcasterId = AnsiConsole.Ask<string>("Broadcaster user ID:");
 
         ConcurrentQueue<(DateTimeOffset At, string Type, string Summary)> events = new();
@@ -54,7 +61,8 @@ internal static class SampleApplication
         builder.WebHost.UseUrls($"http://127.0.0.1:{localPort}");
         builder.Services.AddKickClient(
             options: new() { ApiBaseUrl = "https://api.kick.com" },
-            webhookOptions: new KickWebhookOptions());
+            webhookOptions: new KickWebhookOptions()
+        );
 
         WebApplication app = builder.Build();
         app.MapGet("/", () => "Kick.Client.Sample is running.");
@@ -65,35 +73,47 @@ internal static class SampleApplication
             {
                 events.Enqueue((DateTimeOffset.UtcNow, evt.EventType, Summarize(evt)));
                 return Task.CompletedTask;
-            });
+            }
+        );
 
         await app.StartAsync(ct).ConfigureAwait(false);
         AnsiConsole.MarkupLine($"[green]Server listening on port {localPort}[/]");
 
         // ── DevTunnels setup ───────────────────────────────────────────────
         AnsiConsole.MarkupLine("[cyan]Setting up DevTunnel...[/]");
-        DevTunnelsClient tunnelClient = new(new DevTunnelsClientOptions
-        {
-            CommandTimeout = TimeSpan.FromSeconds(30)
-        });
+        DevTunnelsClient tunnelClient = new(
+            new DevTunnelsClientOptions { CommandTimeout = TimeSpan.FromSeconds(30) }
+        );
         DevTunnelCliProbeResult probe = await tunnelClient.ProbeCliAsync(ct).ConfigureAwait(false);
         if (!probe.IsInstalled)
         {
-            AnsiConsole.MarkupLine("[red]devtunnel CLI not found. Install from https://aka.ms/TunnelsCliDownload[/]");
+            AnsiConsole.MarkupLine(
+                "[red]devtunnel CLI not found. Install from https://aka.ms/TunnelsCliDownload[/]"
+            );
             return;
         }
 
         await tunnelClient.EnsureLoggedInAsync(LoginProvider.GitHub, ct).ConfigureAwait(false);
         const string tunnelId = "kick-client-sample";
-        await tunnelClient.CreateOrUpdateTunnelAsync(tunnelId,
-            new DevTunnelOptions { Description = "Kick.Client.Sample", AllowAnonymous = true }, ct)
+        await tunnelClient
+            .CreateOrUpdateTunnelAsync(
+                tunnelId,
+                new DevTunnelOptions { Description = "Kick.Client.Sample", AllowAnonymous = true },
+                ct
+            )
             .ConfigureAwait(false);
-        await tunnelClient.CreateOrReplacePortAsync(tunnelId, localPort,
-            new DevTunnelPortOptions { Protocol = "https" }, ct)
+        await tunnelClient
+            .CreateOrReplacePortAsync(
+                tunnelId,
+                localPort,
+                new DevTunnelPortOptions { Protocol = "https" },
+                ct
+            )
             .ConfigureAwait(false);
 
-        IDevTunnelHostSession session = await tunnelClient.StartHostSessionAsync(
-            new DevTunnelHostStartOptions { TunnelId = tunnelId }, ct).ConfigureAwait(false);
+        IDevTunnelHostSession session = await tunnelClient
+            .StartHostSessionAsync(new DevTunnelHostStartOptions { TunnelId = tunnelId }, ct)
+            .ConfigureAwait(false);
         await session.WaitForReadyAsync(ct).ConfigureAwait(false);
 
         string publicUrl = session.PublicUrl?.ToString() ?? string.Empty;
@@ -114,12 +134,21 @@ internal static class SampleApplication
         string codeChallenge = KickPkceFlowHelper.DeriveCodeChallenge(codeVerifier);
         string state = Guid.NewGuid().ToString("N");
         string authUrl = KickPkceFlowHelper.BuildAuthorizationUrl(
-            "https://id.kick.com", oauthOptions, codeChallenge, state);
+            "https://id.kick.com",
+            oauthOptions,
+            codeChallenge,
+            state
+        );
 
         AnsiConsole.MarkupLine($"[blue]Opening Kick authorization page...[/]");
         AnsiConsole.MarkupLine(authUrl);
-        try { Process.Start(new ProcessStartInfo(authUrl) { UseShellExecute = true }); }
-        catch { /* shell-open may fail in headless environments */ }
+        try
+        {
+            Process.Start(new ProcessStartInfo(authUrl) { UseShellExecute = true });
+        }
+        catch
+        { /* shell-open may fail in headless environments */
+        }
 
         string authCode = AnsiConsole.Ask<string>("Paste the authorization code:");
 
@@ -132,11 +161,14 @@ internal static class SampleApplication
         using HttpClient apiClient = new() { BaseAddress = new Uri("https://api.kick.com") };
         apiClient.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue(
-                "Bearer", await oauthClient.GetAccessTokenAsync(ct).ConfigureAwait(false));
+                "Bearer",
+                await oauthClient.GetAccessTokenAsync(ct).ConfigureAwait(false)
+            );
 
         KickSubscriptionClient subClient = new(apiClient);
-        IReadOnlyList<KickSubscriptionResult> subResults =
-            await subClient.SubscribeAllAsync(broadcasterId, webhookUrl, ct).ConfigureAwait(false);
+        IReadOnlyList<KickSubscriptionResult> subResults = await subClient
+            .SubscribeAllAsync(broadcasterId, webhookUrl, ct)
+            .ConfigureAwait(false);
 
         foreach (KickSubscriptionResult r in subResults)
         {
@@ -155,7 +187,8 @@ internal static class SampleApplication
                 while (events.TryDequeue(out var e))
                 {
                     AnsiConsole.MarkupLine(
-                        $"[grey]{e.At:HH:mm:ss}[/] [cyan]{e.Type}[/] {Markup.Escape(e.Summary)}");
+                        $"[grey]{e.At:HH:mm:ss}[/] [cyan]{e.Type}[/] {Markup.Escape(e.Summary)}"
+                    );
                 }
             }
         }
@@ -163,22 +196,29 @@ internal static class SampleApplication
 
         // ── Cleanup ────────────────────────────────────────────────────────
         AnsiConsole.MarkupLine("[yellow]Unsubscribing...[/]");
-        await subClient.UnsubscribeAllAsync(broadcasterId, CancellationToken.None).ConfigureAwait(false);
+        await subClient
+            .UnsubscribeAllAsync(broadcasterId, CancellationToken.None)
+            .ConfigureAwait(false);
         await session.StopAsync(CancellationToken.None).ConfigureAwait(false);
         await app.StopAsync(CancellationToken.None).ConfigureAwait(false);
     }
 
-    private static string Summarize(KickWebhookEvent evt) => evt.Payload switch
-    {
-        KickChatMessagePayload m => $"{m.Sender.Username}: {m.Content}",
-        KickChannelFollowedPayload f => $"{f.Follower.Username} followed",
-        KickSubscriptionPayload s => $"{s.Subscriber.Username} subscribed ({s.Duration}mo)",
-        KickSubscriptionGiftsPayload g => $"{g.Gifter.Username} gifted {g.Giftees?.Count ?? 0} subs",
-        KickRewardRedemptionPayload r => $"{r.Redeemer.Username} redeemed '{r.Reward.Title}' [{r.Status}]",
-        KickLivestreamStatusPayload ls => ls.IsLive ? $"Stream started: {ls.Title}" : "Stream ended",
-        KickLivestreamMetadataPayload lm => $"Metadata: {lm.Metadata.Title}",
-        KickModerationBannedPayload b => $"{b.BannedUser.Username} banned",
-        KickKicksGiftedPayload k => $"{k.Sender.Username} gifted {k.Gift.Amount} kicks",
-        _ => "(unknown)",
-    };
+    private static string Summarize(KickWebhookEvent evt) =>
+        evt.Payload switch
+        {
+            KickChatMessagePayload m => $"{m.Sender.Username}: {m.Content}",
+            KickChannelFollowedPayload f => $"{f.Follower.Username} followed",
+            KickSubscriptionPayload s => $"{s.Subscriber.Username} subscribed ({s.Duration}mo)",
+            KickSubscriptionGiftsPayload g =>
+                $"{g.Gifter.Username} gifted {g.Giftees?.Count ?? 0} subs",
+            KickRewardRedemptionPayload r =>
+                $"{r.Redeemer.Username} redeemed '{r.Reward.Title}' [{r.Status}]",
+            KickLivestreamStatusPayload ls => ls.IsLive
+                ? $"Stream started: {ls.Title}"
+                : "Stream ended",
+            KickLivestreamMetadataPayload lm => $"Metadata: {lm.Metadata.Title}",
+            KickModerationBannedPayload b => $"{b.BannedUser.Username} banned",
+            KickKicksGiftedPayload k => $"{k.Sender.Username} gifted {k.Gift.Amount} kicks",
+            _ => "(unknown)",
+        };
 }

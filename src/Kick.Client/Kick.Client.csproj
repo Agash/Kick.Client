@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <IsAotCompatible>true</IsAotCompatible>
@@ -22,16 +22,13 @@
     <ProjectReference Include="..\Kick.Client.Generated\Kick.Client.Generated.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Agash.Webhook.Abstractions" Version="1.0.2" />
-    <PackageReference
-      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
-      Version="10.0.14"
-    />
-    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="2.1.2" />
-    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" Version="2.1.2" />
-    <PackageReference Include="Microsoft.Kiota.Serialization.Json" Version="2.1.2" />
-    <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5" PrivateAssets="all" />
+    <PackageReference Include="Agash.Webhook.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Kiota.Abstractions" />
+    <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" />
+    <PackageReference Include="Microsoft.Kiota.Serialization.Json" />
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <!-- The .NET 11 SDK adds this implicit using for net11.0 targets. Declaring it here gives net10.0

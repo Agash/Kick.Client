@@ -22,7 +22,14 @@
     <ProjectReference Include="..\Kick.Client.Generated\Kick.Client.Generated.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Agash.Webhook.Abstractions" />
+    <ProjectReference
+      Include="$(WebhookAbstractionsProject)"
+      Condition="'$(UseLocalWebhookAbstractions)' == 'true'"
+    />
+    <PackageReference
+      Include="Agash.Webhook.Abstractions"
+      Condition="'$(UseLocalWebhookAbstractions)' != 'true'"
+    />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Kiota.Abstractions" />
     <PackageReference Include="Microsoft.Kiota.Http.HttpClientLibrary" />
